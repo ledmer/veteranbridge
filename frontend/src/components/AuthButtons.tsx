@@ -1,6 +1,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { api, setAuthToken } from "@/lib/api";
 import {
   Dialog,
   DialogContent,
@@ -29,26 +30,54 @@ const AuthButtons = ({ onUserCreated }: AuthButtonsProps) => {
     fullName: ""
   });
 
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log("Login attempt:", loginData);
+const handleLogin = async (e: React.FormEvent) => {
+  e.preventDefault();
+  try {
+    const { data } = await api.post("/api/token/", {
+      username: loginData.email,       
+      password: loginData.password,
+    });
+    localStorage.setItem("access", data.access);
+    localStorage.setItem("refresh", data.refresh);
+    setAuthToken(data.access);
     toast.success("Login successful!");
     setIsLoginOpen(false);
     setLoginData({ email: "", password: "" });
-  };
+  } catch (err: any) {
+    toast.error(err.response?.data?.detail ?? "Login failed");
+  }
+};
 
-  const handleSignup = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (signupData.password !== signupData.confirmPassword) {
-      toast.error("Passwords don't match!");
-      return;
-    }
-    console.log("Signup attempt:", signupData);
+
+const handleSignup = async (e: React.FormEvent) => {
+  e.preventDefault();
+  if (signupData.password !== signupData.confirmPassword) {
+    toast.error("Passwords don't match!");
+    return;
+  }
+  try {
+    console.log("Signup success:");
+    const res = await api.post("/api/v1/register/", {
+      email: signupData.email,
+      password: signupData.password,
+      full_name: signupData.fullName,
+    });
+    console.log("Signup success:", res.data);
     toast.success("Account created successfully!");
     setIsSignupOpen(false);
     setSignupData({ email: "", password: "", confirmPassword: "", fullName: "" });
-    onUserCreated();
-  };
+    onUserCreated();                    
+  } catch (err: any) {
+  console.error("signup 400 detail 👉", err?.response?.data);
+  toast.error(
+    err?.response?.data?.email?.[0] ||
+    err?.response?.data?.password?.[0] ||
+    err?.response?.data?.full_name?.[0] ||
+    err?.response?.data?.detail ||
+    "Signup failed"
+  );
+}
+};
 
   return (
     <div className="flex gap-4">
