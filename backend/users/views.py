@@ -44,6 +44,40 @@ from rest_framework import generics, permissions
 from .serializers import RegisterSerializer, UserSerializer
 
 class RegisterView(generics.CreateAPIView):
-    queryset = CustomUser.objects.all()
     serializer_class = RegisterSerializer
-    permission_classes = [permissions.AllowAny]   # 注册不需要登录
+    permission_classes = [permissions.AllowAny]
+
+
+from rest_framework import viewsets, permissions, status
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from .models import Group, GroupMembership, CustomUser
+from .serializers import GroupSerializer, GroupMembershipSerializer
+
+class GroupViewSet(viewsets.ModelViewSet):
+    queryset           = Group.objects.all().prefetch_related("memberships")
+    serializer_class   = GroupSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+    # 自动把 owner 设为当前用户
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
+
+    # ----------  用户加入  ----------
+    @action(detail=True, methods=["post"], permission_classes=[permissions.IsAuthenticated])
+    def join(self, request, pk=None):
+        group = self.get_object()
+        if GroupMembership.objects.filter(user=request.user, group=group).exists():
+            return Response({"detail": "Already joined"}, status=status.HTTP_409_CONFLICT)
+
+        membership = GroupMembership.objects.create(user=request.user, group=group)
+        return Response(GroupMembershipSerializer(membership).data, status=status.HTTP_201_CREATED)
+
+    # ----------  用户退出  ----------
+    @action(detail=True, methods=["post"], permission_classes=[permissions.IsAuthenticated])
+    def exit(self, request, pk=None):
+        group = self.get_object()
+        deleted, _ = GroupMembership.objects.filter(user=request.user, group=group).delete()
+        if not deleted:
+            return Response({"detail": "Not a member"}, status=status.HTTP_404_NOT_FOUND)
+        return Response(status=status.HTTP_204_NO_CONTENT)

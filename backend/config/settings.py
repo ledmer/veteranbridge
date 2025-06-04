@@ -46,11 +46,17 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
+INSTALLED_APPS += ["corsheaders"]
+MIDDLEWARE = ["corsheaders.middleware.CorsMiddleware", *MIDDLEWARE]
+CORS_ALLOWED_ORIGINS = ["http://localhost:5173"]  # React dev host
+
 # ------------------------------------------------------------------
 # TEMPLATES —— 必须有 DjangoTemplates 后端
 # ------------------------------------------------------------------
 from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+CORS_ALLOW_ALL_ORIGINS = True
 
 TEMPLATES = [
     {

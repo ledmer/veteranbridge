@@ -31,3 +31,36 @@ class UserConnection(models.Model):
 
     def __str__(self):
         return f"{self.user_id} ➜ {self.connected_user_id}"
+
+from django.db import models
+from django.conf import settings
+
+class Group(models.Model):
+    name        = models.CharField(max_length=100, unique=True)
+    description = models.TextField(blank=True)
+    owner       = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        related_name="owned_groups",
+        on_delete=models.CASCADE,
+    )
+    created_at  = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.name
+
+
+class GroupMembership(models.Model):
+    user       = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="group_memberships"
+    )
+    group      = models.ForeignKey(
+        Group, on_delete=models.CASCADE, related_name="memberships"
+    )
+    joined_at  = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ("user", "group")
+        ordering        = ["-joined_at"]
+
+    def __str__(self):
+        return f"{self.user_id} in {self.group_id}"
