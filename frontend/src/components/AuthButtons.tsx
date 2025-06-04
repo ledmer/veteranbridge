@@ -26,7 +26,19 @@ const AuthButtons = ({ onUserCreated }: AuthButtonsProps) => {
     email: "", 
     password: "", 
     confirmPassword: "",
-    fullName: ""
+    fullName: "",
+    job: "",
+    mental_health: "",
+    wellness: "",
+    engage: "",
+    location: "",
+    gender: "",
+    age: "",
+    description: "",
+    hobby: "",
+    profile_pic: "",
+    tags: "",
+    phone: ""
   });
   const [isAuthenticated, setIsAuthenticated] = useState(() => !!localStorage.getItem("access"));
   const [loginUsername, setLoginUsername] = useState("");
@@ -70,7 +82,18 @@ const handleSignup = async (e: React.FormEvent) => {
           username,
           email: signupData.email,
           password: signupData.password,
+          first_name: signupData.fullName.split(" ")[0] || "",
+          last_name: signupData.fullName.split(" ").slice(1).join(" ") || ""
         });
+        // Auto-login after successful signup
+        const { data } = await api.post("/api/token/", {
+          username,
+          password: signupData.password,
+        });
+        localStorage.setItem("access", data.access);
+        localStorage.setItem("refresh", data.refresh);
+        setAuthToken(data.access);
+        setIsAuthenticated(true);
         isUnique = true;
         finalUsername = username;
       } catch (err: any) {
@@ -90,8 +113,7 @@ const handleSignup = async (e: React.FormEvent) => {
     }
     toast.success(`Account created successfully! Your username is: ${finalUsername}`);
     setIsSignupOpen(false);
-    setSignupData({ email: "", password: "", confirmPassword: "", fullName: "" });
-    setIsAuthenticated(true);
+    setSignupData({ email: "", password: "", confirmPassword: "", fullName: "", job: "", mental_health: "", wellness: "", engage: "", location: "", gender: "", age: "", description: "", hobby: "", profile_pic: "", tags: "", phone: "" });
     onUserCreated();
   } catch (err: any) {
     console.error("signup 400 detail 👉", err?.response?.data);
@@ -179,7 +201,7 @@ const handleLogout = () => {
               </DialogHeader>
               <form onSubmit={handleSignup} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="signup-name">Full Name</Label>
+                  <Label htmlFor="signup-name">Full Name <span className="text-red-500">*</span></Label>
                   <Input
                     id="signup-name"
                     type="text"
@@ -190,7 +212,7 @@ const handleLogout = () => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="signup-email">Email</Label>
+                  <Label htmlFor="signup-email">Email <span className="text-red-500">*</span></Label>
                   <Input
                     id="signup-email"
                     type="email"
@@ -201,7 +223,7 @@ const handleLogout = () => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="signup-password">Password</Label>
+                  <Label htmlFor="signup-password">Password <span className="text-red-500">*</span></Label>
                   <Input
                     id="signup-password"
                     type="password"
@@ -212,7 +234,7 @@ const handleLogout = () => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="confirm-password">Confirm Password</Label>
+                  <Label htmlFor="confirm-password">Confirm Password <span className="text-red-500">*</span></Label>
                   <Input
                     id="confirm-password"
                     type="password"

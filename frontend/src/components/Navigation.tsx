@@ -4,11 +4,13 @@ import { Button } from "@/components/ui/button";
 import { Shield, Menu, X } from "lucide-react";
 import AuthButtons from "./AuthButtons";
 import InterestsForm from "./InterestsForm";
+import { useAuthStore } from "@/store/useAuthStore";
 
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [showInterestsForm, setShowInterestsForm] = useState(false);
   const location = useLocation();
+  const { user } = useAuthStore();
 
   const navLinks = [
     { to: "/", label: "Home" },
@@ -53,6 +55,13 @@ const Navigation = () => {
                   {link.label}
                 </Link>
               ))}
+              {/* Profile Button (only if signed in) */}
+              {user && (
+                <Link to="/profile" className="flex items-center gap-2 px-3 py-1 rounded hover:bg-blue-50 transition">
+                  <span className="w-8 h-8 rounded-full bg-blue-200 text-blue-700 flex items-center justify-center font-bold">P</span>
+                  <span className="hidden md:inline text-sm font-medium">Profile</span>
+                </Link>
+              )}
               <AuthButtons onUserCreated={handleUserCreated} />
             </div>
 

@@ -106,7 +106,7 @@ STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
 # CORS settings
-CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_ALL_ORIGINS = True  # For development only; restrict in production
 # If you want to restrict:
 # CORS_ALLOWED_ORIGINS = [
 #     "http://localhost:8080",
