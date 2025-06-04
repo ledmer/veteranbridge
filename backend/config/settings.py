@@ -3,7 +3,7 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 env = environ.Env(DEBUG=(bool, False))
-environ.Env.read_env(BASE_DIR / ".env")     # 读取 .env
+environ.Env.read_env(BASE_DIR / ".env")  # 读取 .env
 
 DEBUG = env("DEBUG")
 SECRET_KEY = env("SECRET_KEY")
@@ -24,6 +24,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework.authtoken",  # 若要 session 认证
     "drf_spectacular",
+    "corsheaders",  # <-- Added for CORS
     # 本地
     "users",
 ]
@@ -37,12 +38,13 @@ DATABASES = {
 }
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",  # <-- Added for CORS (should be at the top)
     "django.middleware.security.SecurityMiddleware",
-    "django.contrib.sessions.middleware.SessionMiddleware",      # ★ 必须
+    "django.contrib.sessions.middleware.SessionMiddleware",  # ★ 必须
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
-    "django.contrib.auth.middleware.AuthenticationMiddleware",   # ★ 必须
-    "django.contrib.messages.middleware.MessageMiddleware",      # ★ 必须
+    "django.contrib.auth.middleware.AuthenticationMiddleware",  # ★ 必须
+    "django.contrib.messages.middleware.MessageMiddleware",  # ★ 必须
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
@@ -50,13 +52,14 @@ MIDDLEWARE = [
 # TEMPLATES —— 必须有 DjangoTemplates 后端
 # ------------------------------------------------------------------
 from pathlib import Path
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",  # ★ 必须
-        "DIRS": [BASE_DIR / "templates"],      # 没有模板文件也保留即可
-        "APP_DIRS": True,                      # 让 admin 自己的模板可被发现
+        "DIRS": [BASE_DIR / "templates"],  # 没有模板文件也保留即可
+        "APP_DIRS": True,  # 让 admin 自己的模板可被发现
         "OPTIONS": {
             "context_processors": [
                 "django.template.context_processors.debug",
@@ -77,12 +80,15 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
-    "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticatedOrReadOnly",),
+    "DEFAULT_PERMISSION_CLASSES": (
+        "rest_framework.permissions.IsAuthenticatedOrReadOnly",
+    ),
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
 
 # -- Simple JWT --
 from datetime import timedelta
+
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=15),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
@@ -98,3 +104,10 @@ SPECTACULAR_SETTINGS = {
 # -- 静态文件 --
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
+
+# CORS settings
+CORS_ALLOW_ALL_ORIGINS = True
+# If you want to restrict:
+# CORS_ALLOWED_ORIGINS = [
+#     "http://localhost:8080",
+# ]
