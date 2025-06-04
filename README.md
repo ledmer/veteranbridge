@@ -1,4 +1,4 @@
-# 🪖 Veteran Bridge – Hackathon Application
+# Veteran Bridge – Hackathon Application
 
 **LLaMA-powered Veteran Wellness and Support Matcher**
 
@@ -6,9 +6,9 @@ Veteran Bridge is an AI-driven system that intelligently connects veterans to pe
 
 ---
 
-## 🔧 Key Features
+## Key Features
 
-### 🧠 LLaMA-Powered Dynamic Grouping
+###  LLaMA-Powered Dynamic Grouping
 - **User Tokens Generator**: Encodes veteran profiles into structured tokens.
 - **Group Tokens Generator**: Represents the makeup and capacity of groups.
 - **Similarity & Compatibility Matching**: Aligns veterans with compatible groups and peers based on shared experiences and support capabilities.
