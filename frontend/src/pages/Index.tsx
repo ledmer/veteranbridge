@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Heart, Users, Phone, Shield, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import Navigation from "@/components/Navigation";
+import Chatbot from "@/components/Chatbot";
 
 const Index = () => {
   return (
@@ -123,7 +124,9 @@ const Index = () => {
             <span>Start Your Journey</span>
           </Button>
         </div>
+        
       </section>
+      <Chatbot/>
     </div>
   );
 };
